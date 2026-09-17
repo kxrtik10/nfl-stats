@@ -53,15 +53,17 @@
     <table>
       <tr>
         <th>Player</th>
-        <th>Season Rush TD</th>
-        <th>Season Rec TD</th>
+        <th>TD vs Opp</th>
+        <th>RZ Carries</th>
+        <th>RZ Targets</th>
         <th>Proj. TD</th>
       </tr>
       {% for p in players %}
       <tr>
         <td class="player-name">{{ p.player }}<span class="pos-tag">{{ p.position }}</span></td>
-        <td>{{ p.rush_td }}</td>
-        <td>{{ p.rec_td }}</td>
+        <td>{{ p.rush_td + p.rec_td }}</td>
+        <td>{{ p.rz_rush_att }}</td>
+        <td>{{ p.rz_targets }}</td>
         <td class="proj-cell {% if p.total_proj >= 0.5 %}proj-high{% elif p.total_proj > 0 %}proj-mid{% else %}proj-low{% endif %}">
           {{ p.total_proj }}
         </td>

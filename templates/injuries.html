@@ -45,7 +45,7 @@
 <body>
   <div class="wrap">
     <h1>NFL TD Projector</h1>
-    <p class="subtitle">Injury report — most recent status per player.</p>
+    <p class="subtitle">Players currently listed as Out — most recent injury report only.</p>
 
     <nav class="tabs">
       <a href="/">Games</a>
@@ -54,13 +54,15 @@
     </nav>
 
     <div class="note">
-      NFL injury reports don't include an official "days out" estimate anywhere in the public
-      data — teams only report a weekly game status (Out / Doubtful / Questionable) and an
-      injury type. That's what's shown below, not a return-date prediction.
+      This list only includes players marked <strong>Out</strong> on the most recent weekly
+      injury report — recovered players naturally drop off once they stop appearing in the
+      report. NFL injury reports don't track an actual "date injured" or a return-date
+      estimate anywhere in the public data; "Reported" below is when that player's report
+      was last updated, not necessarily the day the injury happened.
     </div>
 
     {% if injuries|length == 0 %}
-      <div class="empty">No injury data available for the current pull.</div>
+      <div class="empty">No players currently marked Out in the latest report.</div>
     {% else %}
     <table>
       <tr>
@@ -69,7 +71,7 @@
         <th>Pos</th>
         <th>Injury</th>
         <th>Status</th>
-        <th>Week</th>
+        <th>Reported</th>
       </tr>
       {% for row in injuries %}
       <tr>
@@ -77,10 +79,8 @@
         <td><span class="team-dot" style="background: {{ row.color }};"></span>{{ row.team }}</td>
         <td>{{ row.position }}</td>
         <td>{{ row.report_primary_injury or "—" }}</td>
-        <td class="{% if row.report_status == 'Out' %}status-out{% elif row.report_status == 'Doubtful' %}status-doubtful{% elif row.report_status == 'Questionable' %}status-questionable{% else %}status-other{% endif %}">
-          {{ row.report_status or "—" }}
-        </td>
-        <td>{{ row.week }}</td>
+        <td class="status-out">{{ row.report_status or "—" }}</td>
+        <td>{{ row.date_modified or "—" }}</td>
       </tr>
       {% endfor %}
     </table>
