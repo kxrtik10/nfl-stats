@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ game.away_team }} @ {{ game.home_team }} — TD Projections</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+      background: #0f1115; color: #e8e8e8; margin: 0; padding: 32px 24px 60px;
+    }
+    .wrap { max-width: 820px; margin: 0 auto; }
+    a.back { color: #6c7484; text-decoration: none; font-size: 0.85rem; }
+    a.back:hover { color: #9099a8; }
+    .header-bar { height: 6px; display: flex; border-radius: 4px; overflow: hidden; margin: 16px 0 14px; }
+    .header-bar span { flex: 1; }
+    h1 { font-size: 1.7rem; margin: 0 0 4px; letter-spacing: -0.02em; }
+    p.meta { color: #9099a8; margin-top: 0; margin-bottom: 28px; }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left; font-size: 0.72rem; text-transform: uppercase;
+      letter-spacing: 0.05em; color: #6c7484; padding: 8px 10px; border-bottom: 1px solid #262a33;
+    }
+    td { padding: 10px 10px; border-bottom: 1px solid #1c1f26; font-size: 0.92rem; }
+    tr:hover td { background: #171a21; }
+    .player-name { font-weight: 600; }
+    .pos-tag {
+      display: inline-block; font-size: 0.7rem; color: #6c7484;
+      background: #1c1f26; padding: 1px 6px; border-radius: 4px; margin-left: 6px;
+    }
+    .proj-cell { font-weight: 700; font-variant-numeric: tabular-nums; }
+    .proj-high { color: #4ade80; }
+    .proj-mid { color: #facc15; }
+    .proj-low { color: #6c7484; }
+    .empty { color: #9099a8; padding: 30px 0; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="/">&larr; Back to games</a>
+
+    <div class="header-bar">
+      <span style="background: {{ away_color }};"></span>
+      <span style="background: {{ home_color }};"></span>
+    </div>
+
+    <h1>{{ game.away_team }} @ {{ game.home_team }}</h1>
+    <p class="meta">Week {{ game.week }} &middot; {{ game.gameday }} &middot; {{ game.gametime }} ET</p>
+
+    {% if players|length == 0 %}
+      <div class="empty">No player data found for these teams yet.</div>
+    {% else %}
+    <table>
+      <tr>
+        <th>Player</th>
+        <th>Season Rush TD</th>
+        <th>Season Rec TD</th>
+        <th>Proj. TD</th>
+      </tr>
+      {% for p in players %}
+      <tr>
+        <td class="player-name">{{ p.player }}<span class="pos-tag">{{ p.position }}</span></td>
+        <td>{{ p.rush_td }}</td>
+        <td>{{ p.rec_td }}</td>
+        <td class="proj-cell {% if p.total_proj >= 0.5 %}proj-high{% elif p.total_proj > 0 %}proj-mid{% else %}proj-low{% endif %}">
+          {{ p.total_proj }}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+  </div>
+</body>
+</html>

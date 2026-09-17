@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>All Matchups — NFL TD Projector</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+      background: #0f1115; color: #e8e8e8; margin: 0; padding: 32px 24px 60px;
+    }
+    .wrap { max-width: 1000px; margin: 0 auto; }
+    h1 { font-size: 1.8rem; margin-bottom: 2px; letter-spacing: -0.02em; }
+    p.subtitle { color: #9099a8; margin-top: 0; margin-bottom: 20px; }
+    nav.tabs { display: flex; gap: 4px; border-bottom: 1px solid #262a33; margin-bottom: 28px; }
+    nav.tabs a {
+      color: #9099a8; text-decoration: none; font-size: 0.88rem;
+      padding: 10px 16px; border-bottom: 2px solid transparent;
+    }
+    nav.tabs a.active { color: #e8e8e8; border-bottom-color: #4ade80; }
+    nav.tabs a:hover { color: #e8e8e8; }
+
+    .note {
+      font-size: 0.82rem; color: #9099a8; background: #171a21;
+      border: 1px solid #262a33; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left; font-size: 0.72rem; text-transform: uppercase;
+      letter-spacing: 0.05em; color: #6c7484; padding: 8px 10px; border-bottom: 1px solid #262a33;
+    }
+    td { padding: 10px 10px; border-bottom: 1px solid #1c1f26; font-size: 0.92rem; }
+    tr:hover td { background: #171a21; }
+    .rank { color: #6c7484; font-variant-numeric: tabular-nums; }
+    .team-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }
+    .player-name { font-weight: 600; }
+    .pos-tag {
+      display: inline-block; font-size: 0.7rem; color: #6c7484;
+      background: #1c1f26; padding: 1px 6px; border-radius: 4px; margin-left: 6px;
+    }
+    .proj-cell { font-weight: 700; font-variant-numeric: tabular-nums; color: #4ade80; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>NFL TD Projector</h1>
+    <p class="subtitle">League-wide projections, based on each player's overall red-zone profile across every opponent — not tied to one upcoming matchup.</p>
+
+    <nav class="tabs">
+      <a href="/">Games</a>
+      <a href="/injuries">Injuries</a>
+      <a href="/all-matchups" class="active">All Matchups</a>
+    </nav>
+
+    <div class="note">
+      This ranks players by their season-wide red-zone opportunity &times; conversion rate,
+      blended across every team they've faced — useful for comparing players independent of
+      who they play next. For a specific upcoming game, use the Games tab instead.
+    </div>
+
+    <table>
+      <tr>
+        <th>#</th>
+        <th>Player</th>
+        <th>Team</th>
+        <th>Rush TD</th>
+        <th>Rec TD</th>
+        <th>Proj. TD / game</th>
+      </tr>
+      {% for p in players %}
+      <tr>
+        <td class="rank">{{ loop.index }}</td>
+        <td class="player-name">{{ p.player_name }}<span class="pos-tag">{{ p.position }}</span></td>
+        <td><span class="team-dot" style="background: {{ p.color }};"></span>{{ p.current_team }}</td>
+        <td>{{ p.rush_td|int }}</td>
+        <td>{{ p.rec_td|int }}</td>
+        <td class="proj-cell">{{ p.total_proj }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</body>
+</html>

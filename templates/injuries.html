@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Injuries — NFL TD Projector</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+      background: #0f1115; color: #e8e8e8; margin: 0; padding: 32px 24px 60px;
+    }
+    .wrap { max-width: 1000px; margin: 0 auto; }
+    h1 { font-size: 1.8rem; margin-bottom: 2px; letter-spacing: -0.02em; }
+    p.subtitle { color: #9099a8; margin-top: 0; margin-bottom: 20px; }
+    nav.tabs { display: flex; gap: 4px; border-bottom: 1px solid #262a33; margin-bottom: 28px; }
+    nav.tabs a {
+      color: #9099a8; text-decoration: none; font-size: 0.88rem;
+      padding: 10px 16px; border-bottom: 2px solid transparent;
+    }
+    nav.tabs a.active { color: #e8e8e8; border-bottom-color: #4ade80; }
+    nav.tabs a:hover { color: #e8e8e8; }
+
+    .note {
+      font-size: 0.82rem; color: #9099a8; background: #171a21;
+      border: 1px solid #262a33; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left; font-size: 0.72rem; text-transform: uppercase;
+      letter-spacing: 0.05em; color: #6c7484; padding: 8px 10px; border-bottom: 1px solid #262a33;
+    }
+    td { padding: 10px 10px; border-bottom: 1px solid #1c1f26; font-size: 0.92rem; }
+    tr:hover td { background: #171a21; }
+    .team-dot {
+      display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px;
+    }
+    .status-out { color: #f87171; font-weight: 600; }
+    .status-doubtful { color: #fb923c; font-weight: 600; }
+    .status-questionable { color: #facc15; font-weight: 600; }
+    .status-other { color: #9099a8; }
+    .empty { color: #9099a8; padding: 40px 0; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>NFL TD Projector</h1>
+    <p class="subtitle">Injury report — most recent status per player.</p>
+
+    <nav class="tabs">
+      <a href="/">Games</a>
+      <a href="/injuries" class="active">Injuries</a>
+      <a href="/all-matchups">All Matchups</a>
+    </nav>
+
+    <div class="note">
+      NFL injury reports don't include an official "days out" estimate anywhere in the public
+      data — teams only report a weekly game status (Out / Doubtful / Questionable) and an
+      injury type. That's what's shown below, not a return-date prediction.
+    </div>
+
+    {% if injuries|length == 0 %}
+      <div class="empty">No injury data available for the current pull.</div>
+    {% else %}
+    <table>
+      <tr>
+        <th>Player</th>
+        <th>Team</th>
+        <th>Pos</th>
+        <th>Injury</th>
+        <th>Status</th>
+        <th>Week</th>
+      </tr>
+      {% for row in injuries %}
+      <tr>
+        <td>{{ row.full_name }}</td>
+        <td><span class="team-dot" style="background: {{ row.color }};"></span>{{ row.team }}</td>
+        <td>{{ row.position }}</td>
+        <td>{{ row.report_primary_injury or "—" }}</td>
+        <td class="{% if row.report_status == 'Out' %}status-out{% elif row.report_status == 'Doubtful' %}status-doubtful{% elif row.report_status == 'Questionable' %}status-questionable{% else %}status-other{% endif %}">
+          {{ row.report_status or "—" }}
+        </td>
+        <td>{{ row.week }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+  </div>
+</body>
+</html>

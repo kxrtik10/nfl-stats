@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NFL TD Projector</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+      background: #0f1115;
+      color: #e8e8e8;
+      margin: 0;
+      padding: 32px 24px 60px;
+    }
+    .wrap { max-width: 1000px; margin: 0 auto; }
+    h1 { font-size: 1.8rem; margin-bottom: 2px; letter-spacing: -0.02em; }
+    p.subtitle { color: #9099a8; margin-top: 0; margin-bottom: 20px; }
+
+    nav.tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid #262a33;
+      margin-bottom: 28px;
+    }
+    nav.tabs a {
+      color: #9099a8;
+      text-decoration: none;
+      font-size: 0.88rem;
+      padding: 10px 16px;
+      border-bottom: 2px solid transparent;
+    }
+    nav.tabs a.active {
+      color: #e8e8e8;
+      border-bottom-color: #4ade80;
+    }
+    nav.tabs a:hover { color: #e8e8e8; }
+
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+    a.game-card {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      background: #171a21;
+      border: 1px solid #262a33;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: transform 0.12s ease, border-color 0.12s ease;
+    }
+    a.game-card:hover { transform: translateY(-2px); border-color: #3a3f4b; }
+    .card-bar { height: 5px; display: flex; }
+    .card-bar span { flex: 1; }
+    .card-body { padding: 16px 18px; }
+    .matchup { font-size: 1.15rem; font-weight: 600; margin-bottom: 6px; }
+    .meta { font-size: 0.85rem; color: #9099a8; display: flex; justify-content: space-between; }
+    .week-tag {
+      display: inline-block; font-size: 0.72rem; text-transform: uppercase;
+      letter-spacing: 0.05em; color: #6c7484; margin-bottom: 8px;
+    }
+    .empty { color: #9099a8; padding: 40px 0; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>NFL TD Projector</h1>
+    <p class="subtitle">Upcoming games — click one to see every player's projected TD likelihood.</p>
+
+    <nav class="tabs">
+      <a href="/" class="active">Games</a>
+      <a href="/injuries">Injuries</a>
+      <a href="/all-matchups">All Matchups</a>
+    </nav>
+
+    {% if games|length == 0 %}
+      <div class="empty">No upcoming games found in the schedule data.</div>
+    {% else %}
+    <div class="games-grid">
+      {% for g in games %}
+      <a class="game-card" href="/game/{{ g.game_id }}">
+        <div class="card-bar">
+          <span style="background: {{ g.away_color }};"></span>
+          <span style="background: {{ g.home_color }};"></span>
+        </div>
+        <div class="card-body">
+          <div class="week-tag">Week {{ g.week }} &middot; {{ g.game_type }}</div>
+          <div class="matchup">{{ g.away_name }} @ {{ g.home_name }}</div>
+          <div class="meta">
+            <span>{{ g.gameday }}</span>
+            <span>{{ g.gametime }} ET</span>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</body>
+</html>
