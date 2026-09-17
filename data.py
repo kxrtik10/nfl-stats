@@ -77,4 +77,14 @@ rec_summary.to_csv('rec_summary_vs_team.csv')
 pass_summary.to_csv('pass_summary_vs_team.csv')
  
 print("\nSaved: rush_summary_vs_team.csv, rec_summary_vs_team.csv, pass_summary_vs_team.csv")
+
+import sqlite3
+
+connection = sqlite3.connect('nfl_data.db')
+rush_summary.to_sql('rush_summary', connection, if_exists = 'replace')
+rec_summary.to_sql('rec_summary', connection, if_exists = 'replace')
+pass_summary.to_sql('pass_summary', connection, if_exists = 'replace')
+
+connection.close()
  
+
