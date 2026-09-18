@@ -85,17 +85,20 @@ pass_summary = pd.DataFrame({
 }).fillna(0).reset_index()
 pass_summary = pass_summary.rename(columns={'passer_player_id': 'player_id', 'passer_player_name': 'player_name'})
  
-rush_app = pbp[pbp['rusher_player_id'].notna()][['rusher_player_id', 'rusher_player_name', 'posteam', 'game_date']]
+rush_app = pbp[pbp['rusher_player_id'].notna()][['rusher_player_id', 'rusher_player_name', 'posteam', 'game_date', 'game_id']]
 rush_app = rush_app.rename(columns={'rusher_player_id': 'player_id', 'rusher_player_name': 'player_name'})
  
-rec_app = pbp[pbp['receiver_player_id'].notna()][['receiver_player_id', 'receiver_player_name', 'posteam', 'game_date']]
+rec_app = pbp[pbp['receiver_player_id'].notna()][['receiver_player_id', 'receiver_player_name', 'posteam', 'game_date', 'game_id']]
 rec_app = rec_app.rename(columns={'receiver_player_id': 'player_id', 'receiver_player_name': 'player_name'})
  
-pass_app = pbp[pbp['passer_player_id'].notna()][['passer_player_id', 'passer_player_name', 'posteam', 'game_date']]
+pass_app = pbp[pbp['passer_player_id'].notna()][['passer_player_id', 'passer_player_name', 'posteam', 'game_date', 'game_id']]
 pass_app = pass_app.rename(columns={'passer_player_id': 'player_id', 'passer_player_name': 'player_name'})
  
 all_app = pd.concat([rush_app, rec_app, pass_app]).dropna(subset=['player_id', 'posteam'])
 all_app['game_date'] = pd.to_datetime(all_app['game_date'])
+ 
+games_played = all_app.groupby('player_id')['game_id'].nunique().reset_index()
+games_played = games_played.rename(columns={'game_id': 'games_played'})
  
 player_current_team = (
     all_app.sort_values('game_date')
@@ -104,6 +107,9 @@ player_current_team = (
     .rename(columns={'posteam': 'current_team'})
     .reset_index(drop=True)
 )
+ 
+player_current_team = player_current_team.merge(games_played, on='player_id', how='left')
+player_current_team['games_played'] = player_current_team['games_played'].fillna(1).clip(lower=1)
  
 try:
     rosters = nfl.import_weekly_rosters(YEARS)
@@ -115,7 +121,12 @@ try:
         raise KeyError(f"No known player ID column found. Available columns: {rosters.columns.tolist()}")
  
     status_col = 'status' if 'status' in rosters.columns else None
-    name_col = 'full_name' if 'full_name' in rosters.columns else None
+    name_candidates = ['full_name', 'player_name', 'football_name', 'display_name']
+    name_col = next((c for c in name_candidates if c in rosters.columns), None)
+ 
+    if name_col is None:
+        print(f"No known full-name column found. Available roster columns: {rosters.columns.tolist()}")
+ 
     keep_cols = [id_col, 'position', 'season', 'week'] + ([status_col] if status_col else []) + ([name_col] if name_col else [])
     rosters = rosters[keep_cols].dropna(subset=[id_col])
  

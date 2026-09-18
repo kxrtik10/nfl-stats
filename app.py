@@ -251,14 +251,16 @@ def all_matchups():
     )
     merged['player_name'] = merged['player_name_rush'].combine_first(merged['player_name_rec'])
     merged = merged.fillna(0)
-    merged['total_proj'] = round(merged['rush_proj'] + merged['rec_proj'], 2)
  
     merged = merged.merge(
-        players_meta[['player_id', 'current_team', 'position', 'full_name']], on='player_id', how='left'
+        players_meta[['player_id', 'current_team', 'position', 'full_name', 'games_played']], on='player_id', how='left'
     )
     merged['current_team'] = merged['current_team'].fillna('FA')
     merged['position'] = merged['position'].fillna('N/A')
     merged['full_name'] = merged['full_name'].fillna(merged['player_name'])
+    merged['games_played'] = merged['games_played'].fillna(1).clip(lower=1)
+ 
+    merged['total_proj'] = round((merged['rush_proj'] + merged['rec_proj']) / merged['games_played'], 2)
  
     top10 = merged.sort_values('total_proj', ascending=False).head(10)
  
