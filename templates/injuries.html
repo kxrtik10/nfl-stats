@@ -25,6 +25,13 @@
       border: 1px solid #262a33; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;
     }
 
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; }
+    .filter-btn {
+      background: #171a21; border: 1px solid #262a33; color: #9099a8;
+      font-size: 0.82rem; padding: 6px 14px; border-radius: 999px; cursor: pointer;
+    }
+    .filter-btn.active { background: #1c1f26; color: #e8e8e8; border-color: #3a3f4b; }
+
     table { width: 100%; border-collapse: collapse; }
     th {
       text-align: left; font-size: 0.72rem; text-transform: uppercase;
@@ -36,9 +43,6 @@
       display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px;
     }
     .status-out { color: #f87171; font-weight: 600; }
-    .status-doubtful { color: #fb923c; font-weight: 600; }
-    .status-questionable { color: #facc15; font-weight: 600; }
-    .status-other { color: #9099a8; }
     .empty { color: #9099a8; padding: 40px 0; text-align: center; }
   </style>
 </head>
@@ -54,17 +58,21 @@
     </nav>
 
     <div class="note">
-      This list only includes players marked <strong>Out</strong> on the most recent weekly
-      injury report — recovered players naturally drop off once they stop appearing in the
-      report. NFL injury reports don't track an actual "date injured" or a return-date
-      estimate anywhere in the public data; "Reported" below is when that player's report
-      was last updated, not necessarily the day the injury happened.
+      Only players currently on an active NFL roster and marked <strong>Out</strong> on the most
+      recent weekly report are shown — recovered or retired players drop off automatically.
+      NFL injury reports don't track an actual "date injured" or return estimate anywhere in
+      the public data; "Reported" below is when that player's report was last updated.
     </div>
 
     {% if injuries|length == 0 %}
       <div class="empty">No players currently marked Out in the latest report.</div>
     {% else %}
-    <table>
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="Injured">Injured</button>
+      <button class="filter-btn" data-filter="Other">Other</button>
+    </div>
+    <table id="injuries-table">
       <tr>
         <th>Player</th>
         <th>Team</th>
@@ -74,7 +82,7 @@
         <th>Reported</th>
       </tr>
       {% for row in injuries %}
-      <tr>
+      <tr data-category="{{ row.reason_category }}">
         <td>{{ row.full_name }}</td>
         <td><span class="team-dot" style="background: {{ row.color }};"></span>{{ row.team }}</td>
         <td>{{ row.position }}</td>
@@ -86,5 +94,20 @@
     </table>
     {% endif %}
   </div>
+
+  <script>
+    const buttons = document.querySelectorAll(".filter-btn");
+    const rows = document.querySelectorAll("#injuries-table tr[data-category]");
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        buttons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const filter = btn.getAttribute("data-filter");
+        rows.forEach(row => {
+          row.style.display = (filter === "all" || row.getAttribute("data-category") === filter) ? "" : "none";
+        });
+      });
+    });
+  </script>
 </body>
 </html>
